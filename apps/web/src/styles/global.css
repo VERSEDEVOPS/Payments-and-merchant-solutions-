@@ -2938,8 +2938,25 @@ code {
   font-size: 9px;
   font-weight: 650;
 }
-.profile-form-grid label.full {
+.profile-form-grid label.full,
+.profile-form-grid .profile-slug-preview {
   grid-column: 1 / -1;
+}
+.profile-slug-preview {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 9px;
+  font-weight: 650;
+}
+.profile-slug-preview strong {
+  font-size: 10px;
+  font-weight: 650;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
 }
 .profile-form-grid input,
 .profile-form-grid select,

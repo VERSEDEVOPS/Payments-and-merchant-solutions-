@@ -36,14 +36,16 @@ import {
   STORAGE_API_URL,
 } from "../../lib/config";
 import { readableError } from "../../lib/format";
+import { useCreatorCatalog } from "../../lib/onchainCreators";
 import {
+  allocateProfileSlug,
   CREATOR_CATEGORIES,
   normalizeProfileSlug,
+  profileSlugCandidates,
   profileSlugHash,
 } from "../../lib/profileMetadata";
 
 type FormState = {
-  slug: string;
   name: string;
   bio: string;
   category: string;
@@ -52,7 +54,6 @@ type FormState = {
 };
 
 const initialForm: FormState = {
-  slug: "",
   name: "",
   bio: "",
   category: "Builder",
@@ -70,6 +71,18 @@ export function ProfileEditor() {
   const confirmedHash = useRef<Hex | undefined>(undefined);
   const { address, chainId } = useAccount();
   const publicClient = usePublicClient();
+  const { creators } = useCreatorCatalog(Boolean(address));
+  const reservedSlug = creators.find(
+    (creator) =>
+      !creator.isDemo &&
+      address &&
+      creator.address.toLowerCase() === address.toLowerCase(),
+  )?.slug;
+  const previewSlug =
+    reservedSlug ||
+    (normalizeProfileSlug(form.name).length >= 3
+      ? normalizeProfileSlug(form.name)
+      : "");
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { signMessageAsync } = useSignMessage();
@@ -142,38 +155,44 @@ export function ProfileEditor() {
       return;
     }
 
-    const slug = normalizeProfileSlug(form.slug);
-    if (slug.length < 3) {
-      setError("Choose a slug with at least three letters or numbers.");
-      return;
-    }
-
     setUploading(true);
     try {
       const publishingWallet = getAddress(address);
-      const slugHash = profileSlugHash(slug);
       const [existingSlugHash] = await publicClient.readContract({
         address: CREATOR_REGISTRY_ADDRESS,
         abi: creatorRegistryAbi,
         functionName: "profiles",
         args: [publishingWallet],
       });
+      const candidates = reservedSlug
+        ? [reservedSlug]
+        : profileSlugCandidates(form.name, publishingWallet);
+      const slug =
+        existingSlugHash !== zeroHash
+          ? (candidates.find(
+              (candidate) => profileSlugHash(candidate) === existingSlugHash,
+            ) ?? reservedSlug)
+          : await allocateProfileSlug(
+              candidates,
+              publishingWallet,
+              (slugHash) =>
+                publicClient.readContract({
+                  address: CREATOR_REGISTRY_ADDRESS,
+                  abi: creatorRegistryAbi,
+                  functionName: "creatorForSlug",
+                  args: [slugHash],
+                }),
+            );
+      if (!slug) {
+        throw new Error(
+          "This wallet already owns a profile slug that could not be recovered.",
+        );
+      }
+      const slugHash = profileSlugHash(slug);
       if (existingSlugHash !== zeroHash && existingSlugHash !== slugHash) {
         throw new Error(
           "This wallet already owns a different profile slug. Profile slugs cannot be changed.",
         );
-      }
-      const slugOwner = await publicClient.readContract({
-        address: CREATOR_REGISTRY_ADDRESS,
-        abi: creatorRegistryAbi,
-        functionName: "creatorForSlug",
-        args: [slugHash],
-      });
-      if (
-        slugOwner !== zeroAddress &&
-        getAddress(slugOwner) !== publishingWallet
-      ) {
-        throw new Error("That profile slug is already owned by another wallet.");
       }
       const healthResponse = await fetch(`${STORAGE_API_URL}/health`, {
         headers: { accept: "application/json" },
@@ -263,8 +282,8 @@ export function ProfileEditor() {
           </div>
           <Dialog.Title>Publish creator profile</Dialog.Title>
           <Dialog.Description>
-            Public metadata is stored on IPFS. Your wallet permanently owns the
-            selected slug.
+            Public metadata is stored on IPFS. Your public URL is assigned
+            automatically and reserved to this wallet.
           </Dialog.Description>
           <form onSubmit={publishProfile}>
             <label className="profile-image-input">
@@ -282,26 +301,20 @@ export function ProfileEditor() {
               />
             </label>
             <div className="profile-form-grid">
-              <label>
+              <label className="full">
                 <span>Display name</span>
                 <input
                   required
                   maxLength={80}
+                  aria-label="Display name"
                   value={form.name}
                   onChange={(event) => update("name", event.target.value)}
                 />
               </label>
-              <label>
-                <span>Profile slug</span>
-                <input
-                  required
-                  minLength={3}
-                  maxLength={32}
-                  placeholder="maya-builds"
-                  value={form.slug}
-                  onChange={(event) => update("slug", event.target.value)}
-                />
-              </label>
+              <p className="profile-slug-preview full">
+                <span>Profile URL</span>
+                <strong>{previewSlug ? `/${previewSlug}` : "Assigned automatically"}</strong>
+              </p>
               <label>
                 <span>Category</span>
                 <span className="profile-select-wrap">

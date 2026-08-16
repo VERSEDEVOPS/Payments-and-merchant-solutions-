@@ -62,4 +62,25 @@ describe("ProfileEditor", () => {
     fireEvent.change(category, { target: { value: "Visual art" } });
     expect(category.value).toBe("Visual art");
   });
+
+  it("assigns the profile slug automatically from the display name", async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <ProfileEditor />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Profile" }));
+
+    expect(screen.queryByLabelText("Profile slug")).toBeNull();
+
+    fireEvent.change(await screen.findByLabelText("Display name"), {
+      target: { value: "melody_pm" },
+    });
+    expect(screen.getByText("/melody-pm")).toBeTruthy();
+  });
 });
