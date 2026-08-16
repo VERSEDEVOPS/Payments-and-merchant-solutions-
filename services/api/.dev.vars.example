@@ -1,0 +1,5 @@
+# Profile images and metadata now live in the Worker R2 binding METADATA_BUCKET.
+# No Storacha secrets are required.
+
+# A dedicated, low-balance Polygon relayer. Never use a personal wallet.
+RELAYER_PRIVATE_KEY=

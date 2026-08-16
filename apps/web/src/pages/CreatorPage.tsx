@@ -1,0 +1,181 @@
+import {
+  CheckCircle2,
+  Copy,
+  ExternalLink,
+  Heart,
+  Link2,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
+import { Link, Navigate, useParams } from "react-router-dom";
+import { toast } from "sonner";
+import { demoActivity } from "../lib/data";
+import { useCreatorCatalog } from "../lib/onchainCreators";
+import { compactNumber, shortAddress } from "../lib/format";
+import { TipComposer } from "../features/tipping/TipComposer";
+
+export function CreatorPage() {
+  const { slug } = useParams();
+  const { creators, isLoading } = useCreatorCatalog();
+  const creator = creators.find((item) => item.slug === slug);
+  if (!creator && isLoading)
+    return (
+      <div className="route-loader">
+        <span /> Loading onchain profile…
+      </div>
+    );
+  if (!creator) return <Navigate to="/discover" replace />;
+  const progress = Math.min((creator.raised / creator.goal) * 100, 100);
+
+  return (
+    <div className="creator-page section-shell">
+      <section className="creator-main">
+        <div
+          className={`creator-banner ${creator.accent}`}
+          style={creatorImageStyle(creator.image)}
+        >
+          <div className="banner-grid" />
+          <span className={`avatar xl ${creator.accent}`}>
+            {creator.initials}
+          </span>
+        </div>
+        <div className="creator-header-copy">
+          <div className="creator-title">
+            <div>
+              <div className="name-row">
+                <h1>{creator.name}</h1>
+                {creator.isDemo ? (
+                  <span className="verified-badge demo-badge">
+                    <Sparkles size={15} />
+                    Demo profile
+                  </span>
+                ) : creator.verified ? (
+                  <span className="verified-badge">
+                    <ShieldCheck size={15} />
+                    Verified
+                  </span>
+                ) : null}
+              </div>
+              <p>{creator.handle}</p>
+            </div>
+            <div className="creator-actions">
+              <button
+                aria-label="Copy creator link"
+                onClick={() => {
+                  void navigator.clipboard.writeText(window.location.href);
+                  toast.success("Creator link copied");
+                }}
+              >
+                <Link2 size={17} />
+              </button>
+              <button
+                aria-label="Copy payout address"
+                onClick={() => {
+                  void navigator.clipboard.writeText(creator.address);
+                  toast.success("Wallet address copied");
+                }}
+              >
+                <Copy size={17} />
+              </button>
+            </div>
+          </div>
+          <p className="creator-bio">{creator.bio}</p>
+          <div className="creator-wallet">
+            <span className="status-dot" />
+            <code>{shortAddress(creator.address)}</code>
+            {!creator.isDemo && (
+              <a
+                href={`https://polygonscan.com/address/${creator.address}`}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="View creator wallet on PolygonScan"
+              >
+                <ExternalLink size={13} />
+              </a>
+            )}
+          </div>
+        </div>
+
+        <article className="campaign-card">
+          <div className="campaign-top">
+            <div>
+              <span className="eyebrow">{creator.isDemo ? "Campaign preview" : "Current campaign"}</span>
+              <h2>{creator.campaign}</h2>
+            </div>
+            <span className="campaign-status">
+              <span />
+              {creator.isDemo ? "Demo" : "Funding"}
+            </span>
+          </div>
+          <p>
+            Help turn this idea into a finished, freely available resource for
+            the Verse community.
+          </p>
+          <div className="campaign-progress">
+            <span style={{ width: `${progress}%` }} />
+          </div>
+          <div className="campaign-numbers">
+            <div>
+              <strong>{compactNumber(creator.raised)} VERSE</strong>
+              <span>raised of {compactNumber(creator.goal)}</span>
+            </div>
+            <div>
+              <strong>{creator.supporters}</strong>
+              <span>supporters</span>
+            </div>
+            <div>
+              <strong>{progress.toFixed(0)}%</strong>
+              <span>funded</span>
+            </div>
+          </div>
+        </article>
+
+        <section className="supporter-section">
+          <div className="subsection-heading">
+            <div>
+              <Heart size={17} />
+              <h2>Recent support</h2>
+            </div>
+            <span>{creator.isDemo ? "Illustrative activity" : "Public on Polygon"}</span>
+          </div>
+          <div className="activity-list">
+            {demoActivity.map((activity, index) => (
+              <article key={`${activity.from}-${index}`}>
+                <span className="supporter-avatar">
+                  {activity.from.slice(2, 4)}
+                </span>
+                <div>
+                  <div>
+                    <code>{activity.from}</code>
+                    <span>{activity.time}</span>
+                  </div>
+                  <p>{activity.message}</p>
+                </div>
+                <strong>
+                  +{compactNumber(activity.amount)} <small>VERSE</small>
+                </strong>
+                <CheckCircle2 size={16} />
+              </article>
+            ))}
+          </div>
+          <Link to="/#how-onchain-tips-work" className="text-link">
+            Learn how onchain tips work
+          </Link>
+        </section>
+      </section>
+      <div className="tip-column">
+        <TipComposer creator={creator} />
+      </div>
+    </div>
+  );
+}
+
+function creatorImageStyle(image?: string) {
+  return image
+    ? {
+        backgroundImage: `linear-gradient(to top, rgba(9, 9, 11, .72), rgba(9, 9, 11, .08)), url("${image}")`,
+        backgroundPosition: "center",
+        backgroundSize: "cover",
+      }
+    : undefined;
+}

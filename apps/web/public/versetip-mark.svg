@@ -1,0 +1,13 @@
+<svg width="64" height="64" viewBox="9 7 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="versetip-mark">
+      <path d="M12.5 16H21.5L31.9 39.2L39.4 22.4H34.8L45.5 11.5L56.2 22.4H51.6L36.7 48.5H28.3L12.5 16Z"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#versetip-mark)">
+    <rect x="10" y="10" width="48" height="40" fill="#4F7BF7"/>
+    <path d="M23 27L35.5 27L43 52H24L23 27Z" fill="#8A61E8"/>
+    <path d="M36.5 23H53L39 52H28L36.5 23Z" fill="#EF5D70"/>
+    <path d="M33 23.5L45.5 9.5L58 23.5H33Z" fill="#F4B740"/>
+  </g>
+</svg>

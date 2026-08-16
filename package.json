@@ -1,0 +1,18 @@
+{
+  "name": "versetip",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A creator tipping reference application for the Verse ecosystem",
+  "scripts": {
+    "dev": "pnpm --filter @versetip/web dev",
+    "build": "pnpm --filter @versetip/web build",
+    "lint": "pnpm --filter @versetip/web lint",
+    "test": "pnpm test:contracts && pnpm --filter @versetip/web test && pnpm --filter @versetip/api test",
+    "test:contracts": "cd contracts && forge test --offline",
+    "format:contracts": "cd contracts && forge fmt --check",
+    "preflight:profiles": "node scripts/profile-publishing-preflight.mjs"
+  },
+  "keywords": ["verse", "polygon", "creator", "tips"],
+  "license": "MIT",
+  "packageManager": "pnpm@10.14.0"
+}

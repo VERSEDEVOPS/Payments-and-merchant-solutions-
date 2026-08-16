@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+!.env.production.example
+.dev.vars
+.secrets/
+.wrangler/
+coverage/
+contracts/cache/
+contracts/out/
+contracts/broadcast/
+contracts/deployments/*.json
+contracts/lib/openzeppelin-contracts/lib/
+.DS_Store
+*.log

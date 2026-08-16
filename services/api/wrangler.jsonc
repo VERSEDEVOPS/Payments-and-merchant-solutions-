@@ -1,0 +1,47 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "versetip-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-16",
+  "compatibility_flags": ["nodejs_compat"],
+  "account_id": "8e6e443fe353bb4107a01c492d111fc6",
+  "vars": {
+    "ALLOWED_ORIGIN": "http://localhost:5173,http://127.0.0.1:5173",
+    "MAX_SPONSORED_CLAIM_WEI": "100000000000000000000000",
+    "POLYGON_RPC_URL": "https://polygon.drpc.org",
+    "TIP_VAULT_ADDRESS": "0x706DB138a532b59Df3664f3e8aB86e36a744DD00",
+  },
+  "ratelimits": [
+    {
+      "name": "UPLOAD_RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": { "limit": 6, "period": 60 },
+    },
+    {
+      "name": "CLAIM_RATE_LIMITER",
+      "namespace_id": "1002",
+      "simple": { "limit": 3, "period": 60 },
+    },
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "RELAYER_COORDINATOR",
+        "class_name": "RelayerCoordinator",
+      },
+    ],
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["RelayerCoordinator"],
+    },
+  ],
+  "r2_buckets": [
+    {
+      "binding": "METADATA_BUCKET",
+      "bucket_name": "versetip-metadata",
+    },
+  ],
+  "observability": { "enabled": true },
+}
