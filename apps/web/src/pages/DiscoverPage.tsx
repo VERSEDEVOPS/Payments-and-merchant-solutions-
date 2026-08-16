@@ -157,12 +157,19 @@ export function DiscoverPage() {
             className="creator-card"
           >
             <div
-              className={`creator-card-art ${creator.accent}`}
-              style={creatorImageStyle(creator.image)}
+              className={`creator-card-art ${creator.accent}${creator.image ? " has-photo" : ""}`}
             >
-              <span className={`avatar ${creator.accent}`}>
-                {creator.initials}
-              </span>
+              {creator.image ? (
+                <img
+                  className="creator-card-photo"
+                  src={creator.image}
+                  alt=""
+                />
+              ) : (
+                <span className={`avatar ${creator.accent}`}>
+                  {creator.initials}
+                </span>
+              )}
               <span className="category-pill">{creator.category}</span>
             </div>
             <div className="creator-card-copy">
@@ -197,14 +204,4 @@ export function DiscoverPage() {
       )}
     </div>
   );
-}
-
-function creatorImageStyle(image?: string) {
-  return image
-    ? {
-        backgroundImage: `linear-gradient(to top, rgba(9, 9, 11, .55), rgba(9, 9, 11, .06)), url("${image}")`,
-        backgroundPosition: "center 18%",
-        backgroundSize: "cover",
-      }
-    : undefined;
 }
