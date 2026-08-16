@@ -109,7 +109,7 @@ These broadcasts did **not** go through the formal audit-digest release runners.
 - `/health` reports `ok: true`, `storage: ready`, `relayer: ready`
 - R2 bucket `versetip-metadata` bound as `METADATA_BUCKET`
 - Worker `TIP_VAULT_ADDRESS` is the live vault
-- Allowed origins are currently local Vite only. Add the production frontend origin before a public launch
+- Allowed origins: local Vite plus `https://versetip.pages.dev`
 - Relayer private key is a Worker secret only. An unused first key (`0x26ec…0186`) was discarded after a failed TTY secret-put; do not fund or reuse it
 - `VITE_STORAGE_API_URL` and `VITE_RELAYER_URL` are public frontend endpoint values. Relayer keys must never use a `VITE_` prefix
 
@@ -124,14 +124,20 @@ Use these templates; do not commit populated secrets:
 
 Vite embeds `VITE_*` values at build / dev-server start. Restart after changing them.
 
+## Frontend hosting
+
+- Production URL: `https://versetip.pages.dev` (Cloudflare Pages project `versetip`)
+- Worker allowlist includes that origin
+- `main` deploys via `.github/workflows/deploy-web.yml` using GitHub secret `CLOUDFLARE_API_TOKEN`
+- Native Pages ↔ GitHub install returned Cloudflare error 8000011, so this is Direct Upload + Actions, not dashboard Git sync
+- Add `https://versetip.pages.dev` in Reown Cloud allowed domains if wallet connect rejects the hosted origin
+
 ## Work remaining
 
-1. Restart Vite so it picks up the filled `.env`, then smoke-test on Polygon: publish a real profile, small direct tip, vault deposit, self-paid claim, sponsored claim.
+1. Smoke-test the hosted app on Polygon: publish a real profile, small direct tip, vault deposit, self-paid claim, sponsored claim.
 2. Verify contract source on PolygonScan.
-3. Add the public frontend origin to the Worker allowlist, then host the app.
-4. Set `VITE_ANALYTICS_DOMAIN` if public traffic is expected.
-5. Create a Polygon Safe and transfer vault ownership with Ownable2Step (`transferOwnership` from the deployer, `acceptOwnership` from the Safe). This is the documented security upgrade, not optional polish. Then obtain an independent audit / remediation record (`docs/AUDIT_HANDOFF.md`).
-6. Commit and push in small reviewable units once the user confirms the Git history strategy. Nothing is currently committed.
+3. Confirm the Reown Cloud allowed-domain list includes `versetip.pages.dev`.
+4. Create a Polygon Safe and transfer vault ownership with Ownable2Step (`transferOwnership` from the deployer, `acceptOwnership` from the Safe). This is the documented security upgrade, not optional polish. Then obtain an independent audit / remediation record (`docs/AUDIT_HANDOFF.md`).
 
 Older architecture / metadata / operations docs may still mention Storacha. Prefer this handoff, `README.md`, and the latest journal entries when they disagree.
 

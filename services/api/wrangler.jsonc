@@ -6,7 +6,7 @@
   "compatibility_flags": ["nodejs_compat"],
   "account_id": "8e6e443fe353bb4107a01c492d111fc6",
   "vars": {
-    "ALLOWED_ORIGIN": "http://localhost:5173,http://127.0.0.1:5173",
+    "ALLOWED_ORIGIN": "http://localhost:5173,http://127.0.0.1:5173,https://versetip.pages.dev",
     "MAX_SPONSORED_CLAIM_WEI": "100000000000000000000000",
     "POLYGON_RPC_URL": "https://polygon.drpc.org",
     "TIP_VAULT_ADDRESS": "0x706DB138a532b59Df3664f3e8aB86e36a744DD00",

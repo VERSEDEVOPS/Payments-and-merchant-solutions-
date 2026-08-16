@@ -1,0 +1,49 @@
+name: Deploy frontend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/web/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - ".github/workflows/deploy-web.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-web
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.14.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @versetip/web build
+        env:
+          VITE_WALLETCONNECT_PROJECT_ID: 5423def4a6d894310da27a68b0f97ab5
+          VITE_POLYGON_RPC_URL: https://polygon.drpc.org
+          VITE_TIP_VAULT_ADDRESS: "0x706DB138a532b59Df3664f3e8aB86e36a744DD00"
+          VITE_CREATOR_REGISTRY_ADDRESS: "0xFaaa9315Af9E0711Bc01Ecd717243117b816A268"
+          VITE_DEPLOYMENT_BLOCK: "92127803"
+          VITE_RELAYER_URL: https://versetip-api.goodness-mbakara.workers.dev
+          VITE_STORAGE_API_URL: https://versetip-api.goodness-mbakara.workers.dev
+          VITE_ANALYTICS_SCRIPT: https://analytics.vgdh.io/js/script.js
+          VITE_ANALYTICS_DOMAIN: versetip.pages.dev
+      - name: Deploy to Cloudflare Pages
+        working-directory: services/api
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: 8e6e443fe353bb4107a01c492d111fc6
+        run: pnpm exec wrangler pages deploy ../../apps/web/dist --project-name=versetip --branch=main

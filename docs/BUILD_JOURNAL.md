@@ -455,3 +455,13 @@ This journal records the end-to-end construction of VerseTip as it happens. It i
   3. Confirm `owner()` is the Safe on PolygonScan before treating the vault as production-ready.
 - Why: a single key can pause deposits and recover excess tokens. If that key is lost or compromised, admin of a fund-holding contract is a single point of failure. The owner still cannot seize creator liabilities.
 - This is recorded in `docs/SECURITY.md`, README remaining work, and `docs/HANDOFF.md`. The Security page also surfaces the same upgrade path. Ownership has not been transferred yet.
+
+### Cloudflare Pages frontend
+
+- Created Pages project `versetip`. Production URL: `https://versetip.pages.dev`.
+- Native Pages GitHub install failed with Cloudflare error `8000011` (Git installation). Deploy path is Direct Upload plus `.github/workflows/deploy-web.yml` on `main`.
+- Set Pages production/preview env vars for Node 20, vault, registry, deployment block, Worker URLs, Reown project ID, and `VITE_ANALYTICS_DOMAIN=versetip.pages.dev`.
+- Stored `CLOUDFLARE_API_TOKEN` as a GitHub Actions secret (local Wrangler OAuth token; replace with a dedicated API token if it expires).
+- Built the Vite app with those values, uploaded to Pages, and confirmed `/` and `/security` return HTML. Vault and Worker URLs are present in the production bundle.
+- Added `https://versetip.pages.dev` to Worker `ALLOWED_ORIGIN` and redeployed `versetip-api`. CORS preflight from that origin returns 204.
+- SPA fallback is `apps/web/public/_redirects` (`/* /index.html 200`).

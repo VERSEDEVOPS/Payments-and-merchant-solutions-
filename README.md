@@ -1,5 +1,7 @@
 # VerseTip
 
+**Live app:** [https://versetip.pages.dev](https://versetip.pages.dev)
+
 VerseTip is a creator-tipping reference application for the Verse Buildathon. It combines one-transaction direct `fxVERSE` tips with a claimable campaign vault for messages, collaborator splits, batched withdrawals, and optional gas-sponsored claims.
 
 The production chain is **Polygon mainnet (chain ID 137)**. The supported token is [`fxVERSE`](https://polygonscan.com/token/0xc708d6f2153933daa50b2d0758955be0a93a8fec) at `0xc708D6F2153933DAA50B2D0758955Be0A93A8FEc`. There is no official Verse testnet token; see [the network note](docs/NETWORKS.md).
@@ -35,8 +37,19 @@ Ownership can later move to a Safe through Ownable2Step. Formal `mainnet-release
 - URL: `https://versetip-api.goodness-mbakara.workers.dev`
 - `/health` reports `storage: ready` and `relayer: ready`
 - R2 bucket: `versetip-metadata` (binding `METADATA_BUCKET`)
-- Allowed origins today: local Vite only (`http://localhost:5173`, `http://127.0.0.1:5173`). Add the public frontend origin before a public launch.
+- Allowed origins: local Vite plus `https://versetip.pages.dev`
 - Relayer address: `0x4cecE710dD12753d588D7299eC339dF18953B5d6` (Foundry account `versetip-relayer`)
+
+## Frontend hosting
+
+The Vite app is on Cloudflare Pages as project `versetip`.
+
+- Production: [https://versetip.pages.dev](https://versetip.pages.dev)
+- Pushes to `main` that touch the web app deploy through `.github/workflows/deploy-web.yml`
+- Build-time `VITE_*` values are set on the Pages project and in the GitHub Action (vault, registry, Worker URLs, Reown project ID, analytics domain)
+- GitHub secret `CLOUDFLARE_API_TOKEN` is required for Actions. Native Cloudflare GitHub app install failed (Pages Git installation error), so deploy is Direct Upload + Actions rather than dashboard Git sync
+
+Add `https://versetip.pages.dev` in the Reown Cloud allowed domains list if wallet connect refuses the hosted origin.
 
 Storacha was the original upload target. `up.storacha.network` does not resolve, so uploads moved to R2 while keeping `ipfs://` URIs that the already-deployed `MetadataURI` contract accepts.
 
@@ -108,12 +121,10 @@ The Polygon fork suite uses `POLYGON_RPC_URL` when supplied and otherwise uses t
 
 ## What is still open
 
-1. Restart Vite and smoke-test publish, direct tip, vault deposit, self-paid claim, and sponsored claim on Polygon.
+1. Smoke-test the hosted app on Polygon: publish a real profile, small direct tip, vault deposit, self-paid claim, and sponsored claim.
 2. Verify contract source on PolygonScan.
-3. Add the production frontend origin to the Worker allowlist, then host the app.
-4. Set the Verse Analytics domain if public traffic is expected.
-5. Create a Polygon Safe and transfer vault ownership via Ownable2Step (`transferOwnership` then `acceptOwnership`). A single EOA should not remain the admin of the fund-holding vault. Then obtain an independent audit.
-6. First git commit. The tree is still entirely untracked.
+3. Confirm `https://versetip.pages.dev` is allowed in the Reown Cloud project if AppKit blocks the origin.
+4. Create a Polygon Safe and transfer vault ownership via Ownable2Step (`transferOwnership` then `acceptOwnership`). A single EOA should not remain the admin of the fund-holding vault. Then obtain an independent audit.
 
 ## Reference guides
 
