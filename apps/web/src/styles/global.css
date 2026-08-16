@@ -1571,6 +1571,15 @@ code {
 }
 .activity-list article > strong small {
   font-size: 7px;
+}
+.activity-list a {
+  color: #9ab6ff;
+}
+.activity-empty {
+  padding: 18px 3px;
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
   color: var(--text-tertiary);
 }
 .activity-list article > svg {

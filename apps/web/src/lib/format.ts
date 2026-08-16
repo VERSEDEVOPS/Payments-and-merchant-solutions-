@@ -10,6 +10,19 @@ export function shortAddress(value?: string): string {
   return `${value.slice(0, 6)}…${value.slice(-4)}`;
 }
 
+export function shortHash(value?: string): string {
+  if (!value) return "";
+  return `${value.slice(0, 10)}…${value.slice(-4)}`;
+}
+
+export function relativeTime(unixSeconds: number, nowMs = Date.now()): string {
+  const delta = Math.max(0, Math.floor(nowMs / 1000) - unixSeconds);
+  if (delta < 60) return `${delta}s`;
+  if (delta < 3600) return `${Math.floor(delta / 60)}m`;
+  if (delta < 86400) return `${Math.floor(delta / 3600)}h`;
+  return `${Math.floor(delta / 86400)}d`;
+}
+
 export function readableError(error: unknown): string {
   const message = error instanceof Error ? error.message : String(error);
   if (/rejected|denied/i.test(message))

@@ -10,14 +10,24 @@ import {
 } from "lucide-react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
-import { demoActivity } from "../lib/data";
 import { useOnchainCreator } from "../lib/onchainCreators";
-import { compactNumber, shortAddress } from "../lib/format";
+import { useRecentSupport } from "../lib/onchainSupport";
+import {
+  compactNumber,
+  relativeTime,
+  shortAddress,
+  shortHash,
+} from "../lib/format";
 import { TipComposer } from "../features/tipping/TipComposer";
+import { EXPLORER_URL, TOKEN_SYMBOL } from "../lib/config";
+import { formatUnits } from "viem";
 
 export function CreatorPage() {
   const { slug } = useParams();
   const { creator, isLoading } = useOnchainCreator(slug);
+  const support = useRecentSupport(
+    creator && !creator.isDemo ? creator.address : undefined,
+  );
   if (!creator && isLoading)
     return (
       <div className="route-loader">
@@ -161,40 +171,61 @@ export function CreatorPage() {
         </article>
         )}
 
-        {!creator.unregistered && (
         <section className="supporter-section">
           <div className="subsection-heading">
             <div>
               <Heart size={17} />
               <h2>Recent support</h2>
             </div>
-            <span>{creator.isDemo ? "Illustrative activity" : "Public on Polygon"}</span>
+            <span>
+              {creator.isDemo ? "Illustrative profile" : "Public on Polygon"}
+            </span>
           </div>
           <div className="activity-list">
-            {demoActivity.map((activity, index) => (
-              <article key={`${activity.from}-${index}`}>
-                <span className="supporter-avatar">
-                  {activity.from.slice(2, 4)}
-                </span>
-                <div>
+            {creator.isDemo ? (
+              <p className="activity-empty">
+                Showcase profiles do not list live tips.
+              </p>
+            ) : support.isLoading ? (
+              <p className="activity-empty">Loading onchain tips…</p>
+            ) : support.data?.length ? (
+              support.data.map((item) => (
+                <article key={item.hash}>
+                  <span className="supporter-avatar">
+                    {item.from.slice(2, 4)}
+                  </span>
                   <div>
-                    <code>{activity.from}</code>
-                    <span>{activity.time}</span>
+                    <div>
+                      <code>{shortAddress(item.from)}</code>
+                      <span>{relativeTime(item.timestamp)}</span>
+                    </div>
+                    <p>
+                      {item.rail === "vault" ? "Vault tip" : "Direct tip"}
+                      {" · "}
+                      <a
+                        href={`${EXPLORER_URL}/tx/${item.hash}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {shortHash(item.hash)}
+                      </a>
+                    </p>
                   </div>
-                  <p>{activity.message}</p>
-                </div>
-                <strong>
-                  +{compactNumber(activity.amount)} <small>VERSE</small>
-                </strong>
-                <CheckCircle2 size={16} />
-              </article>
-            ))}
+                  <strong>
+                    +{compactNumber(Number(formatUnits(item.amount, 18)))}{" "}
+                    <small>{TOKEN_SYMBOL}</small>
+                  </strong>
+                  <CheckCircle2 size={16} />
+                </article>
+              ))
+            ) : (
+              <p className="activity-empty">No onchain tips yet.</p>
+            )}
           </div>
           <Link to="/#how-onchain-tips-work" className="text-link">
             Learn how onchain tips work
           </Link>
         </section>
-        )}
       </section>
       <div className="tip-column">
         <TipComposer creator={creator} />
