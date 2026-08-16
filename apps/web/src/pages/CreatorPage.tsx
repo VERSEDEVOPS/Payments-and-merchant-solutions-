@@ -10,14 +10,13 @@ import {
 import { Link, Navigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { demoActivity } from "../lib/data";
-import { useCreatorCatalog } from "../lib/onchainCreators";
+import { useOnchainCreator } from "../lib/onchainCreators";
 import { compactNumber, shortAddress } from "../lib/format";
 import { TipComposer } from "../features/tipping/TipComposer";
 
 export function CreatorPage() {
   const { slug } = useParams();
-  const { creators, isLoading } = useCreatorCatalog();
-  const creator = creators.find((item) => item.slug === slug);
+  const { creator, isLoading } = useOnchainCreator(slug);
   if (!creator && isLoading)
     return (
       <div className="route-loader">

@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { getAddress, parseAbiItem, type Address, type Hex } from "viem";
+import { getAddress, parseAbiItem, zeroAddress, type Address, type Hex } from "viem";
 import { usePublicClient } from "wagmi";
+import { getLogsInChunks } from "./blockRanges";
 import {
   CREATOR_REGISTRY_ADDRESS,
   creatorRegistryAbi,
@@ -12,12 +13,11 @@ import {
   profileSlugHash,
   type CreatorCategory,
 } from "./profileMetadata";
-import { ipfsGateways } from "./ipfs";
+import { fetchIpfsJson, ipfsGateways } from "./ipfs";
 
 const profileUpdatedEvent = parseAbiItem(
   "event ProfileUpdated(address indexed creator, bytes32 indexed slugHash, string metadataURI, uint64 updatedAt)",
 );
-const gateways = ipfsGateways();
 
 type ProfileMetadata = {
   version: 1;
@@ -48,12 +48,18 @@ export function useCreatorCatalog(enabled = true) {
     staleTime: 60_000,
     queryFn: async () => {
       if (!publicClient) return demoCreators;
-      const logs = await publicClient.getLogs({
-        address: CREATOR_REGISTRY_ADDRESS,
-        event: profileUpdatedEvent,
-        fromBlock: DEPLOYMENT_BLOCK,
-        toBlock: "latest",
-      });
+      const latestBlock = await publicClient.getBlockNumber();
+      const logs = await getLogsInChunks(
+        (range) =>
+          publicClient.getLogs({
+            address: CREATOR_REGISTRY_ADDRESS,
+            event: profileUpdatedEvent,
+            fromBlock: range.fromBlock,
+            toBlock: range.toBlock,
+          }),
+        DEPLOYMENT_BLOCK,
+        latestBlock,
+      );
       const addresses = [
         ...new Set(
           logs
@@ -90,22 +96,54 @@ export function useCreatorCatalog(enabled = true) {
   };
 }
 
+export function useOnchainCreator(slug: string | undefined) {
+  const catalog = useCreatorCatalog();
+  const publicClient = usePublicClient();
+  const listed = catalog.creators.find((item) => item.slug === slug);
+  const needsLookup =
+    Boolean(slug) &&
+    Boolean(publicClient) &&
+    CREATOR_REGISTRY_ADDRESS !== zeroAddress &&
+    (!listed || listed.isDemo);
+  const lookup = useQuery({
+    queryKey: ["creator-by-slug", slug, CREATOR_REGISTRY_ADDRESS],
+    enabled: needsLookup,
+    staleTime: 30_000,
+    queryFn: async () => {
+      if (!publicClient || !slug) return null;
+      const slugHash = profileSlugHash(slug);
+      const owner = await publicClient.readContract({
+        address: CREATOR_REGISTRY_ADDRESS,
+        abi: creatorRegistryAbi,
+        functionName: "creatorForSlug",
+        args: [slugHash],
+      });
+      if (owner === zeroAddress) return null;
+      const [onchainSlugHash, metadataURI, , active] =
+        await publicClient.readContract({
+          address: CREATOR_REGISTRY_ADDRESS,
+          abi: creatorRegistryAbi,
+          functionName: "profiles",
+          args: [owner],
+        });
+      if (!active) return null;
+      const metadata = await fetchMetadata(metadataURI);
+      if (!isProfileMetadataForRecord(metadata, owner, onchainSlugHash))
+        return null;
+      return toCreator(metadata, owner);
+    },
+  });
+  return {
+    creator: lookup.data ?? listed,
+    isLoading: catalog.isLoading || (needsLookup && lookup.isPending),
+  };
+}
+
 async function fetchMetadata(uri: string): Promise<ProfileMetadata | null> {
   if (!/^ipfs:\/\/b[a-z2-7]+$/.test(uri)) return null;
   const cid = uri.slice("ipfs://".length);
   try {
-    const metadata = await Promise.any(
-      gateways.map(async (gateway) => {
-        const response = await fetch(`${gateway}${cid}`, {
-          signal: AbortSignal.timeout(6_000),
-          headers: { accept: "application/json" },
-        });
-        if (!response.ok) throw new Error("IPFS gateway failed");
-        const length = Number(response.headers.get("content-length") ?? "0");
-        if (length > 64_000) throw new Error("Metadata exceeds limit");
-        return response.json() as Promise<unknown>;
-      }),
-    );
+    const metadata = await fetchIpfsJson(cid);
     return isProfileMetadata(metadata) ? metadata : null;
   } catch {
     return null;
@@ -172,7 +210,7 @@ function toCreator(metadata: ProfileMetadata, address: Address): Creator {
     goal: 1,
     campaign: "No active campaign",
     category: metadata.category,
-    image: `${gateways[0]}${metadata.image.slice("ipfs://".length)}`,
+    image: `${ipfsGateways()[0]}${metadata.image.slice("ipfs://".length)}`,
     isDemo: false,
   };
 }

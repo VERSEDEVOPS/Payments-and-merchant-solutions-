@@ -11,7 +11,8 @@ import {
   TIP_VAULT_ADDRESS,
   tipVaultAbi,
 } from "./config";
-import { ipfsGateways } from "./ipfs";
+import { getLogsInChunks } from "./blockRanges";
+import { fetchIpfsJson } from "./ipfs";
 
 const campaignCreatedEvent = parseAbiItem(
   "event CampaignCreated(bytes32 indexed campaignId, address indexed creator, bytes32 indexed slugHash, address[] recipients, uint16[] shares, string metadataURI)",
@@ -22,8 +23,6 @@ const campaignTipEvent = parseAbiItem(
 const directVaultTipEvent = parseAbiItem(
   "event TipReceived(address indexed supporter, address indexed beneficiary, uint256 amount, bytes32 indexed campaignId, bytes32 messageHash)",
 );
-const gateways = ipfsGateways();
-
 type CampaignMetadata = {
   version: 1;
   kind: "campaign";
@@ -72,21 +71,32 @@ export function useOnchainStudio(creator?: Address) {
     staleTime: 30_000,
     queryFn: async () => {
       if (!publicClient || !creator) return emptyStudio;
+      const latestBlock = await publicClient.getBlockNumber();
       const [createdLogs, directLogs] = await Promise.all([
-        publicClient.getLogs({
-          address: TIP_VAULT_ADDRESS,
-          event: campaignCreatedEvent,
-          args: { creator },
-          fromBlock: DEPLOYMENT_BLOCK,
-          toBlock: "latest",
-        }),
-        publicClient.getLogs({
-          address: TIP_VAULT_ADDRESS,
-          event: directVaultTipEvent,
-          args: { beneficiary: creator },
-          fromBlock: DEPLOYMENT_BLOCK,
-          toBlock: "latest",
-        }),
+        getLogsInChunks(
+          (range) =>
+            publicClient.getLogs({
+              address: TIP_VAULT_ADDRESS,
+              event: campaignCreatedEvent,
+              args: { creator },
+              fromBlock: range.fromBlock,
+              toBlock: range.toBlock,
+            }),
+          DEPLOYMENT_BLOCK,
+          latestBlock,
+        ),
+        getLogsInChunks(
+          (range) =>
+            publicClient.getLogs({
+              address: TIP_VAULT_ADDRESS,
+              event: directVaultTipEvent,
+              args: { beneficiary: creator },
+              fromBlock: range.fromBlock,
+              toBlock: range.toBlock,
+            }),
+          DEPLOYMENT_BLOCK,
+          latestBlock,
+        ),
       ]);
 
       const campaignLogs = createdLogs.slice(-20).reverse();
@@ -103,13 +113,18 @@ export function useOnchainStudio(creator?: Address) {
             });
           const [metadata, tips] = await Promise.all([
             fetchCampaignMetadata(metadataURI),
-            publicClient.getLogs({
-              address: TIP_VAULT_ADDRESS,
-              event: campaignTipEvent,
-              args: { campaignId },
-              fromBlock: log.blockNumber,
-              toBlock: "latest",
-            }),
+            getLogsInChunks(
+              (range) =>
+                publicClient.getLogs({
+                  address: TIP_VAULT_ADDRESS,
+                  event: campaignTipEvent,
+                  args: { campaignId },
+                  fromBlock: range.fromBlock,
+                  toBlock: range.toBlock,
+                }),
+              log.blockNumber,
+              latestBlock,
+            ),
           ]);
           if (
             !metadata ||
@@ -181,18 +196,7 @@ async function fetchCampaignMetadata(
   if (!/^ipfs:\/\/b[a-z2-7]+$/.test(uri)) return null;
   const cid = uri.slice("ipfs://".length);
   try {
-    const value = await Promise.any(
-      gateways.map(async (gateway) => {
-        const response = await fetch(`${gateway}${cid}`, {
-          signal: AbortSignal.timeout(6_000),
-          headers: { accept: "application/json" },
-        });
-        if (!response.ok) throw new Error("IPFS gateway failed");
-        const length = Number(response.headers.get("content-length") ?? "0");
-        if (length > 64_000) throw new Error("Metadata exceeds limit");
-        return response.json() as Promise<unknown>;
-      }),
-    );
+    const value = await fetchIpfsJson(cid);
     return isCampaignMetadata(value) ? value : null;
   } catch {
     return null;
