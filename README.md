@@ -1,6 +1,6 @@
 # VerseTip
 
-**Live app:** [https://versetip.vercel.app](https://versetip.vercel.app) (Vercel). Previous host: [https://versetip.pages.dev](https://versetip.pages.dev).
+**Live app:** [https://versetip.vercel.app](https://versetip.vercel.app)
 
 VerseTip is a creator-tipping reference application for the Verse Buildathon. It combines one-transaction direct `fxVERSE` tips with a claimable campaign vault for messages, collaborator splits, batched withdrawals, and optional gas-sponsored claims.
 
@@ -37,7 +37,7 @@ Ownership can later move to a Safe through Ownable2Step. Formal `mainnet-release
 - URL: `https://versetip-api.goodness-mbakara.workers.dev`
 - `/health` reports `storage: ready` and `relayer: ready`
 - R2 bucket: `versetip-metadata` (binding `METADATA_BUCKET`)
-- Allowed origins: local Vite, `https://versetip.vercel.app`, the Vercel team alias, and `https://versetip.pages.dev`
+- Allowed origins: local Vite, `https://versetip.vercel.app`, and the Vercel team alias
 - Relayer address: `0x4cecE710dD12753d588D7299eC339dF18953B5d6` (Foundry account `versetip-relayer`)
 
 ## Frontend hosting

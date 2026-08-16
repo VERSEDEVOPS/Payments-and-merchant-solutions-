@@ -109,7 +109,7 @@ These broadcasts did **not** go through the formal audit-digest release runners.
 - `/health` reports `ok: true`, `storage: ready`, `relayer: ready`
 - R2 bucket `versetip-metadata` bound as `METADATA_BUCKET`
 - Worker `TIP_VAULT_ADDRESS` is the live vault
-- Allowed origins: local Vite plus `https://versetip.pages.dev`
+- Allowed origins: local Vite, `https://versetip.vercel.app`, and the Vercel team alias
 - Relayer private key is a Worker secret only. An unused first key (`0x26ec…0186`) was discarded after a failed TTY secret-put; do not fund or reuse it
 - `VITE_STORAGE_API_URL` and `VITE_RELAYER_URL` are public frontend endpoint values. Relayer keys must never use a `VITE_` prefix
 
@@ -126,18 +126,18 @@ Vite embeds `VITE_*` values at build / dev-server start. Restart after changing 
 
 ## Frontend hosting
 
-- Production URL: `https://versetip.pages.dev` (Cloudflare Pages project `versetip`)
-- Worker allowlist includes that origin
-- `main` deploys via `.github/workflows/deploy-web.yml` using GitHub secret `CLOUDFLARE_API_TOKEN`
-- Native Pages ↔ GitHub install returned Cloudflare error 8000011, so this is Direct Upload + Actions, not dashboard Git sync
-- Add `https://versetip.pages.dev` in Reown Cloud allowed domains if wallet connect rejects the hosted origin
+- Vercel project `versetip` (`prj_UmkYHSwWSvUwQ20WDPJZ5DIGgkoi`). Intended URL: `https://versetip.vercel.app`.
+- Cloudflare Pages project `versetip` was deleted. Do not redeploy the frontend there.
+- Git auto-deploy on Vercel still needs the Vercel GitHub app on the `VERSEDEVOPS` org.
+- Worker allowlist includes the Vercel origins, not `pages.dev`.
 
 ## Work remaining
 
-1. Smoke-test the hosted app on Polygon: publish a real profile, small direct tip, vault deposit, self-paid claim, sponsored claim.
-2. Verify contract source on PolygonScan.
-3. Confirm the Reown Cloud allowed-domain list includes `versetip.pages.dev`.
-4. Create a Polygon Safe and transfer vault ownership with Ownable2Step (`transferOwnership` from the deployer, `acceptOwnership` from the Safe). This is the documented security upgrade, not optional polish. Then obtain an independent audit / remediation record (`docs/AUDIT_HANDOFF.md`).
+1. Install the Vercel GitHub app on `VERSEDEVOPS`, then deploy `main` to production.
+2. Smoke-test the hosted app on Polygon: publish a real profile, small direct tip, vault deposit, self-paid claim, sponsored claim.
+3. Verify contract source on PolygonScan.
+4. Confirm the Reown Cloud allowed-domain list includes the live Vercel origin.
+5. Create a Polygon Safe and transfer vault ownership with Ownable2Step (`transferOwnership` from the deployer, `acceptOwnership` from the Safe). This is the documented security upgrade, not optional polish. Then obtain an independent audit / remediation record (`docs/AUDIT_HANDOFF.md`).
 
 Older architecture / metadata / operations docs may still mention Storacha. Prefer this handoff, `README.md`, and the latest journal entries when they disagree.
 

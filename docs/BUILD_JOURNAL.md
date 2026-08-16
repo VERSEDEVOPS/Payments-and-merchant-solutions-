@@ -465,3 +465,9 @@ This journal records the end-to-end construction of VerseTip as it happens. It i
 - Built the Vite app with those values, uploaded to Pages, and confirmed `/` and `/security` return HTML. Vault and Worker URLs are present in the production bundle.
 - Added `https://versetip.pages.dev` to Worker `ALLOWED_ORIGIN` and redeployed `versetip-api`. CORS preflight from that origin returns 204.
 - SPA fallback is `apps/web/public/_redirects` (`/* /index.html 200`).
+
+### Retired Cloudflare Pages
+
+- Deleted the Cloudflare Pages project `versetip`. `versetip.pages.dev` is gone.
+- Removed Pages auto-deploy. Frontend host is Vercel; the Cloudflare Worker stays for R2 uploads and sponsored claims.
+- Dropped `pages.dev` from Worker `ALLOWED_ORIGIN` and from README / handoff live-app pointers.
