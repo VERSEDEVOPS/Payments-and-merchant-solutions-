@@ -297,8 +297,8 @@ export function HomePage() {
 function creatorImageStyle(image?: string) {
   return image
     ? {
-        backgroundImage: `linear-gradient(to top, rgba(9, 9, 11, .72), rgba(9, 9, 11, .08)), url("${image}")`,
-        backgroundPosition: "center",
+        backgroundImage: `linear-gradient(to top, rgba(9, 9, 11, .55), rgba(9, 9, 11, .06)), url("${image}")`,
+        backgroundPosition: "center 18%",
         backgroundSize: "cover",
       }
     : undefined;

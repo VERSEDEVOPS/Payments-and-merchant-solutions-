@@ -918,10 +918,10 @@ button {
     #1d121a;
 }
 .avatar.xl {
-  width: 74px;
-  height: 74px;
-  border-radius: 22px;
-  font-size: 18px;
+  width: 92px;
+  height: 92px;
+  border-radius: 26px;
+  font-size: 20px;
 }
 .category-pill {
   font-size: 8px;
@@ -1173,11 +1173,33 @@ button {
   min-width: 0;
 }
 .creator-banner {
-  height: 190px;
+  height: 268px;
   border: 1px solid var(--border-soft);
   border-radius: 24px;
   position: relative;
+  overflow: hidden;
   margin-bottom: 0;
+}
+.creator-banner-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 18%;
+  display: block;
+}
+.creator-banner.has-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(9, 9, 11, 0.42) 0%,
+    rgba(9, 9, 11, 0.08) 42%,
+    transparent 68%
+  );
+  pointer-events: none;
 }
 .banner-grid {
   position: absolute;
@@ -1187,15 +1209,28 @@ button {
     linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
   background-size: 28px 28px;
   mask-image: linear-gradient(115deg, #000, transparent 70%);
+  pointer-events: none;
+}
+.creator-banner.has-photo .banner-grid {
+  opacity: 0.28;
 }
 .creator-banner .avatar {
   position: absolute;
   left: 26px;
-  bottom: -37px;
-  box-shadow: 0 0 0 7px var(--bg);
+  bottom: 22px;
+  z-index: 1;
+  overflow: hidden;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+}
+.creator-banner .avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 16%;
+  display: block;
 }
 .creator-header-copy {
-  padding: 54px 4px 25px;
+  padding: 22px 4px 25px;
 }
 .creator-title {
   display: flex;
@@ -3580,7 +3615,12 @@ code {
     padding-top: 20px;
   }
   .creator-banner {
-    height: 150px;
+    height: 210px;
+  }
+  .avatar.xl {
+    width: 76px;
+    height: 76px;
+    border-radius: 22px;
   }
   .creator-title {
     gap: 20px;

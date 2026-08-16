@@ -31,12 +31,22 @@ export function CreatorPage() {
     <div className="creator-page section-shell">
       <section className="creator-main">
         <div
-          className={`creator-banner ${creator.accent}`}
-          style={creatorImageStyle(creator.image)}
+          className={`creator-banner ${creator.accent}${creator.image ? " has-photo" : ""}`}
         >
+          {creator.image && (
+            <img
+              className="creator-banner-photo"
+              src={creator.image}
+              alt=""
+            />
+          )}
           <div className="banner-grid" />
           <span className={`avatar xl ${creator.accent}`}>
-            {creator.initials}
+            {creator.image ? (
+              <img src={creator.image} alt={creator.name} />
+            ) : (
+              creator.initials
+            )}
           </span>
         </div>
         <div className="creator-header-copy">
@@ -191,14 +201,4 @@ export function CreatorPage() {
       </div>
     </div>
   );
-}
-
-function creatorImageStyle(image?: string) {
-  return image
-    ? {
-        backgroundImage: `linear-gradient(to top, rgba(9, 9, 11, .72), rgba(9, 9, 11, .08)), url("${image}")`,
-        backgroundPosition: "center",
-        backgroundSize: "cover",
-      }
-    : undefined;
 }
