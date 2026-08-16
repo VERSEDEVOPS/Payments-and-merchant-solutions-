@@ -7,13 +7,17 @@ import {
   X,
 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCreatorCatalog } from "../lib/onchainCreators";
 import { compactNumber } from "../lib/format";
+import { parseRecipientAddress } from "../lib/recipient";
 
 export function DiscoverPage() {
   const { creators, isFallback } = useCreatorCatalog();
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
+  const [walletInput, setWalletInput] = useState("");
+  const tipAddress = parseRecipientAddress(walletInput.trim());
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [category, setCategory] = useState("All");
   const categories = useMemo(
@@ -50,9 +54,31 @@ export function DiscoverPage() {
         <h1>Discover work worth supporting.</h1>
         <p>
           Explore builders, artists, educators, and community leaders creating
-          value across the Verse ecosystem.
+          value across the Verse ecosystem. You can also tip any Polygon wallet
+          — they do not need a profile first.
         </p>
       </div>
+      <form
+        className="tip-wallet-bar"
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (tipAddress) navigate(`/${tipAddress}`);
+        }}
+      >
+        <label>
+          <span>Tip any wallet</span>
+          <input
+            value={walletInput}
+            onChange={(event) => setWalletInput(event.target.value)}
+            placeholder="0x…"
+            aria-label="Recipient wallet address"
+            spellCheck={false}
+          />
+        </label>
+        <button type="submit" className="button primary" disabled={!tipAddress}>
+          Open tip page
+        </button>
+      </form>
       <div className="filter-bar">
         <label>
           <Search size={17} />

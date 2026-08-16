@@ -6,6 +6,7 @@ import {
   Link2,
   ShieldCheck,
   Sparkles,
+  Wallet,
 } from "lucide-react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -43,7 +44,12 @@ export function CreatorPage() {
             <div>
               <div className="name-row">
                 <h1>{creator.name}</h1>
-                {creator.isDemo ? (
+                {creator.unregistered ? (
+                  <span className="verified-badge demo-badge">
+                    <Wallet size={15} />
+                    Unregistered
+                  </span>
+                ) : creator.isDemo ? (
                   <span className="verified-badge demo-badge">
                     <Sparkles size={15} />
                     Demo profile
@@ -95,6 +101,21 @@ export function CreatorPage() {
           </div>
         </div>
 
+        {creator.unregistered ? (
+        <article className="campaign-card">
+          <div className="campaign-top">
+            <div>
+              <span className="eyebrow">Unregistered recipient</span>
+              <h2>Tips are waiting at this wallet</h2>
+            </div>
+          </div>
+          <p>
+            Direct tips arrive immediately. Vault tips stay claimable until this
+            person connects the same wallet in Studio. Publishing a profile is
+            optional and does not move the funds.
+          </p>
+        </article>
+        ) : (
         <article className="campaign-card">
           <div className="campaign-top">
             <div>
@@ -128,7 +149,9 @@ export function CreatorPage() {
             </div>
           </div>
         </article>
+        )}
 
+        {!creator.unregistered && (
         <section className="supporter-section">
           <div className="subsection-heading">
             <div>
@@ -161,6 +184,7 @@ export function CreatorPage() {
             Learn how onchain tips work
           </Link>
         </section>
+        )}
       </section>
       <div className="tip-column">
         <TipComposer creator={creator} />

@@ -1,5 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import { getAddress, parseAbiItem, zeroAddress, type Address, type Hex } from "viem";
+import {
+  getAddress,
+  parseAbiItem,
+  zeroAddress,
+  zeroHash,
+  type Address,
+  type Hex,
+} from "viem";
 import { usePublicClient } from "wagmi";
 import { getLogsInChunks } from "./blockRanges";
 import {
@@ -14,6 +21,7 @@ import {
   type CreatorCategory,
 } from "./profileMetadata";
 import { fetchIpfsJson, ipfsGateways } from "./ipfs";
+import { guestRecipient, parseRecipientAddress } from "./recipient";
 
 const profileUpdatedEvent = parseAbiItem(
   "event ProfileUpdated(address indexed creator, bytes32 indexed slugHash, string metadataURI, uint64 updatedAt)",
@@ -99,7 +107,14 @@ export function useCreatorCatalog(enabled = true) {
 export function useOnchainCreator(slug: string | undefined) {
   const catalog = useCreatorCatalog();
   const publicClient = usePublicClient();
-  const listed = catalog.creators.find((item) => item.slug === slug);
+  const recipientAddress = parseRecipientAddress(slug);
+  const listed =
+    catalog.creators.find(
+      (item) =>
+        !item.isDemo &&
+        recipientAddress &&
+        item.address.toLowerCase() === recipientAddress.toLowerCase(),
+    ) ?? catalog.creators.find((item) => item.slug === slug);
   const needsLookup =
     Boolean(slug) &&
     Boolean(publicClient) &&
@@ -111,6 +126,29 @@ export function useOnchainCreator(slug: string | undefined) {
     staleTime: 30_000,
     queryFn: async () => {
       if (!publicClient || !slug) return null;
+      if (recipientAddress) {
+        const [onchainSlugHash, metadataURI, , active] =
+          await publicClient.readContract({
+            address: CREATOR_REGISTRY_ADDRESS,
+            abi: creatorRegistryAbi,
+            functionName: "profiles",
+            args: [recipientAddress],
+          });
+        if (!active || onchainSlugHash === zeroHash) {
+          return guestRecipient(recipientAddress);
+        }
+        const metadata = await fetchMetadata(metadataURI);
+        if (
+          !isProfileMetadataForRecord(
+            metadata,
+            recipientAddress,
+            onchainSlugHash,
+          )
+        ) {
+          return guestRecipient(recipientAddress);
+        }
+        return toCreator(metadata, recipientAddress);
+      }
       const slugHash = profileSlugHash(slug);
       const owner = await publicClient.readContract({
         address: CREATOR_REGISTRY_ADDRESS,
@@ -133,8 +171,14 @@ export function useOnchainCreator(slug: string | undefined) {
       return toCreator(metadata, owner);
     },
   });
+  const creator =
+    lookup.data ??
+    listed ??
+    (recipientAddress && !needsLookup
+      ? guestRecipient(recipientAddress)
+      : undefined);
   return {
-    creator: lookup.data ?? listed,
+    creator,
     isLoading: catalog.isLoading || (needsLookup && lookup.isPending),
   };
 }

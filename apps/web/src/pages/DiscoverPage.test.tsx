@@ -28,4 +28,21 @@ describe("DiscoverPage filters", () => {
     expect(screen.getByText("Maya Okafor")).toBeTruthy();
     expect(screen.getByText("Kola Frames")).toBeTruthy();
   });
+
+  it("lets a supporter open a tip page for any wallet address", () => {
+    render(
+      <MemoryRouter>
+        <DiscoverPage />
+      </MemoryRouter>,
+    );
+
+    const field = screen.getAllByLabelText("Recipient wallet address")[0];
+    const submit = screen.getAllByRole("button", { name: /open tip page/i })[0];
+    expect(submit).toHaveProperty("disabled", true);
+
+    fireEvent.change(field, {
+      target: { value: "0x323811a100dbf486909066aa68b8c0e1a609d733" },
+    });
+    expect(submit).toHaveProperty("disabled", false);
+  });
 });

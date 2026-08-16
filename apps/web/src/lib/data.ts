@@ -14,6 +14,7 @@ export type Creator = {
   category: string;
   image?: string;
   isDemo: boolean;
+  unregistered?: boolean;
 };
 
 export const creators: Creator[] = [

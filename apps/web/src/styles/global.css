@@ -1781,6 +1781,35 @@ code {
 .success-card .button {
   margin-top: 10px;
 }
+.tip-wallet-bar {
+  display: flex;
+  gap: 10px;
+  align-items: end;
+}
+.tip-wallet-bar label {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: 9px;
+  font-weight: 650;
+}
+.tip-wallet-bar input {
+  height: 44px;
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 13px;
+  padding: 0 14px;
+  color: var(--text);
+  outline: 0;
+  font-size: 11px;
+}
+.tip-wallet-bar button {
+  height: 44px;
+  white-space: nowrap;
+}
 .filter-bar {
   display: flex;
   gap: 10px;
@@ -3586,8 +3615,12 @@ code {
   .filter-bar button {
     padding: 0 14px;
   }
-  .filter-bar {
+  .filter-bar,
+  .tip-wallet-bar {
     flex-direction: column;
+  }
+  .tip-wallet-bar button {
+    width: 100%;
   }
   .filter-bar label,
   .filter-bar button {

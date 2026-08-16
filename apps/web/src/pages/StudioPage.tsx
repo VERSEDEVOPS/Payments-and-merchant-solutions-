@@ -257,7 +257,7 @@ export function StudioPage() {
             </h2>
             <p>
               {hasVault
-                ? "Vault tips wait here until you claim. Direct tips already went to your wallet."
+                ? "Vault tips wait here until you claim, including tips sent before you published a profile. Direct tips already went to your wallet."
                 : "Vault address will appear after deployment."}
             </p>
           </div>

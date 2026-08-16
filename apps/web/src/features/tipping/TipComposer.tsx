@@ -233,8 +233,10 @@ export function TipComposer({ creator }: { creator: Creator }) {
       </div>
       <p className="rail-description">
         {rail === "direct"
-          ? "One transaction, delivered immediately to the creator."
-          : "Add a message and let the creator claim tips together."}
+          ? "One transaction, delivered immediately to this wallet."
+          : creator.unregistered
+            ? "Held for this address. They can claim in Studio after connecting — no profile required."
+            : "Add a message and let the creator claim tips together."}
       </p>
       <label className="field-label" htmlFor="tip-amount">
         Amount
