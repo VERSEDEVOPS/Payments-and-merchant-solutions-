@@ -1172,6 +1172,98 @@ button {
 .creator-main {
   min-width: 0;
 }
+.creator-page.is-recipient {
+  padding-top: 28px;
+}
+.recipient-panel {
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--surface);
+  padding: 26px 26px 22px;
+}
+.recipient-panel-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.recipient-panel-top > div {
+  flex: 1;
+  min-width: 0;
+}
+.recipient-panel-top p {
+  margin: 3px 0 0;
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.recipient-mark {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  color: var(--text);
+  flex: 0 0 auto;
+}
+.recipient-panel h1 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+.recipient-panel h1 code {
+  display: block;
+  overflow-wrap: anywhere;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--text);
+}
+.recipient-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0 20px;
+}
+.recipient-actions button,
+.recipient-actions a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--bg);
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 650;
+}
+.recipient-rails {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.recipient-rails > div {
+  border: 1px solid var(--border-soft);
+  border-radius: 14px;
+  padding: 14px 15px;
+  background: var(--bg);
+}
+.recipient-rails strong {
+  display: block;
+  font-size: 10px;
+  margin-bottom: 5px;
+}
+.recipient-rails p {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: 10px;
+  line-height: 1.55;
+}
 .creator-banner {
   height: 268px;
   border: 1px solid var(--border-soft);
@@ -3622,6 +3714,12 @@ code {
   }
   .creator-page {
     padding-top: 20px;
+  }
+  .recipient-panel-top {
+    flex-wrap: wrap;
+  }
+  .recipient-rails {
+    grid-template-columns: 1fr;
   }
   .creator-banner {
     height: 210px;

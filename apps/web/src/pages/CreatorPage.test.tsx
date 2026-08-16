@@ -52,7 +52,10 @@ describe("CreatorPage unregistered recipient", () => {
     );
 
     expect(screen.getByText("Unregistered")).toBeTruthy();
-    expect(screen.getByText(/tips are waiting at this wallet/i)).toBeTruthy();
+    expect(screen.getByText(/send to a wallet/i)).toBeTruthy();
+    expect(
+      screen.getByText("0x323811A100dBF486909066AA68b8C0E1A609d733"),
+    ).toBeTruthy();
     expect(screen.getByText("Send a tip")).toBeTruthy();
     expect(screen.queryByText("Discover")).toBeNull();
     const tx = screen.getByRole("link", { name: /0x8a73e82a/i });

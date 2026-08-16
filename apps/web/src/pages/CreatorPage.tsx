@@ -37,9 +37,68 @@ export function CreatorPage() {
   if (!creator) return <Navigate to="/discover" replace />;
   const progress = Math.min((creator.raised / creator.goal) * 100, 100);
 
+  const copyAddress = async () => {
+    await navigator.clipboard.writeText(creator.address);
+    toast.success("Wallet address copied");
+  };
+
   return (
-    <div className="creator-page section-shell">
+    <div
+      className={`creator-page section-shell${creator.unregistered ? " is-recipient" : ""}`}
+    >
       <section className="creator-main">
+        {creator.unregistered ? (
+          <article className="recipient-panel">
+            <div className="recipient-panel-top">
+              <span className="recipient-mark" aria-hidden="true">
+                <Wallet size={22} />
+              </span>
+              <div>
+                <span className="eyebrow">Send to a wallet</span>
+                <p>No VerseTip profile yet. Tips still settle to this address.</p>
+              </div>
+              <span className="verified-badge demo-badge">Unregistered</span>
+            </div>
+            <h1>
+              <code>{creator.address}</code>
+            </h1>
+            <div className="recipient-actions">
+              <button type="button" onClick={() => void copyAddress()}>
+                <Copy size={14} />
+                Copy address
+              </button>
+              <a
+                href={`${EXPLORER_URL}/address/${creator.address}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <ExternalLink size={14} />
+                PolygonScan
+              </a>
+              <button
+                type="button"
+                onClick={() => {
+                  void navigator.clipboard.writeText(window.location.href);
+                  toast.success("Tip link copied");
+                }}
+              >
+                <Link2 size={14} />
+                Copy tip link
+              </button>
+            </div>
+            <div className="recipient-rails">
+              <div>
+                <strong>Direct</strong>
+                <p>fxVERSE lands in this wallet in one transaction.</p>
+              </div>
+              <div>
+                <strong>Vault</strong>
+                <p>Held until they connect this same wallet in Studio and claim.</p>
+              </div>
+            </div>
+          </article>
+        ) : (
+          <>
         <div
           className={`creator-banner ${creator.accent}${creator.image ? " has-photo" : ""}`}
         >
@@ -64,12 +123,7 @@ export function CreatorPage() {
             <div>
               <div className="name-row">
                 <h1>{creator.name}</h1>
-                {creator.unregistered ? (
-                  <span className="verified-badge demo-badge">
-                    <Wallet size={15} />
-                    Unregistered
-                  </span>
-                ) : creator.isDemo ? (
+                {creator.isDemo ? (
                   <span className="verified-badge demo-badge">
                     <Sparkles size={15} />
                     Demo profile
@@ -95,10 +149,7 @@ export function CreatorPage() {
               </button>
               <button
                 aria-label="Copy payout address"
-                onClick={() => {
-                  void navigator.clipboard.writeText(creator.address);
-                  toast.success("Wallet address copied");
-                }}
+                onClick={() => void copyAddress()}
               >
                 <Copy size={17} />
               </button>
@@ -110,7 +161,7 @@ export function CreatorPage() {
             <code>{shortAddress(creator.address)}</code>
             {!creator.isDemo && (
               <a
-                href={`https://polygonscan.com/address/${creator.address}`}
+                href={`${EXPLORER_URL}/address/${creator.address}`}
                 target="_blank"
                 rel="noreferrer"
                 aria-label="View creator wallet on PolygonScan"
@@ -121,21 +172,6 @@ export function CreatorPage() {
           </div>
         </div>
 
-        {creator.unregistered ? (
-        <article className="campaign-card">
-          <div className="campaign-top">
-            <div>
-              <span className="eyebrow">Unregistered recipient</span>
-              <h2>Tips are waiting at this wallet</h2>
-            </div>
-          </div>
-          <p>
-            Direct tips arrive immediately. Vault tips stay claimable until this
-            person connects the same wallet in Studio. Publishing a profile is
-            optional and does not move the funds.
-          </p>
-        </article>
-        ) : (
         <article className="campaign-card">
           <div className="campaign-top">
             <div>
@@ -169,6 +205,7 @@ export function CreatorPage() {
             </div>
           </div>
         </article>
+          </>
         )}
 
         <section className="supporter-section">

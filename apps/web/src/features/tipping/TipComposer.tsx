@@ -18,6 +18,7 @@ import {
   parseUnits,
   zeroHash,
 } from "viem";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   useAccount,
   useBalance,
@@ -48,6 +49,7 @@ export function TipComposer({ creator }: { creator: Creator }) {
   const [message, setMessage] = useState("");
   const [rail, setRail] = useState<"direct" | "vault">("direct");
   const [error, setError] = useState("");
+  const queryClient = useQueryClient();
   const { address, isConnected, chainId } = useAccount();
   const { data: polBalance } = useBalance({ address });
   const { data: verseBalance } = useReadContract({
@@ -103,8 +105,9 @@ export function TipComposer({ creator }: { creator: Creator }) {
         creator: creator.slug,
         amount: Number(amount),
       });
+      void queryClient.invalidateQueries({ queryKey: ["recent-support"] });
     }
-  }, [receipt.isSuccess, rail, creator.slug, amount]);
+  }, [amount, creator.slug, queryClient, rail, receipt.isSuccess]);
 
   function submitTip() {
     setError("");
