@@ -1,14 +1,6 @@
 name: Deploy frontend
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "apps/web/**"
-      - "package.json"
-      - "pnpm-lock.yaml"
-      - "pnpm-workspace.yaml"
-      - ".github/workflows/deploy-web.yml"
   workflow_dispatch:
 
 concurrency:

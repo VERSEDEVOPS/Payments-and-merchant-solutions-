@@ -1,6 +1,6 @@
 # VerseTip
 
-**Live app:** [https://versetip.pages.dev](https://versetip.pages.dev)
+**Live app:** [https://versetip.vercel.app](https://versetip.vercel.app) (Vercel). Previous host: [https://versetip.pages.dev](https://versetip.pages.dev).
 
 VerseTip is a creator-tipping reference application for the Verse Buildathon. It combines one-transaction direct `fxVERSE` tips with a claimable campaign vault for messages, collaborator splits, batched withdrawals, and optional gas-sponsored claims.
 
@@ -37,19 +37,20 @@ Ownership can later move to a Safe through Ownable2Step. Formal `mainnet-release
 - URL: `https://versetip-api.goodness-mbakara.workers.dev`
 - `/health` reports `storage: ready` and `relayer: ready`
 - R2 bucket: `versetip-metadata` (binding `METADATA_BUCKET`)
-- Allowed origins: local Vite plus `https://versetip.pages.dev`
+- Allowed origins: local Vite, `https://versetip.vercel.app`, the Vercel team alias, and `https://versetip.pages.dev`
 - Relayer address: `0x4cecE710dD12753d588D7299eC339dF18953B5d6` (Foundry account `versetip-relayer`)
 
 ## Frontend hosting
 
-The Vite app is on Cloudflare Pages as project `versetip`.
+The Vite app is a Vercel project named `versetip` (`prj_UmkYHSwWSvUwQ20WDPJZ5DIGgkoi`) on the Goodness Mbakara team.
 
-- Production: [https://versetip.pages.dev](https://versetip.pages.dev)
-- Pushes to `main` that touch the web app deploy through `.github/workflows/deploy-web.yml`
-- Build-time `VITE_*` values are set on the Pages project and in the GitHub Action (vault, registry, Worker URLs, Reown project ID, analytics domain)
-- GitHub secret `CLOUDFLARE_API_TOKEN` is required for Actions. Native Cloudflare GitHub app install failed (Pages Git installation error), so deploy is Direct Upload + Actions rather than dashboard Git sync
+- Production alias: [https://versetip.vercel.app](https://versetip.vercel.app)
+- Build: `pnpm install --frozen-lockfile` then `pnpm --filter @versetip/web build`, output `apps/web/dist`
+- Vite `VITE_*` values are set on the Vercel project (vault, registry, block, Worker URLs, Reown project ID)
+- SPA fallback is in `vercel.json`
+- Git auto-deploy needs the [Vercel GitHub app](https://github.com/apps/vercel) installed on the `VERSEDEVOPS` org. The API cannot link this repo until that install exists.
 
-Add `https://versetip.pages.dev` in the Reown Cloud allowed domains list if wallet connect refuses the hosted origin.
+Add the live Vercel origin in the Reown Cloud allowed domains list if wallet connect refuses the hosted origin.
 
 Storacha was the original upload target. `up.storacha.network` does not resolve, so uploads moved to R2 while keeping `ipfs://` URIs that the already-deployed `MetadataURI` contract accepts.
 
@@ -123,7 +124,7 @@ The Polygon fork suite uses `POLYGON_RPC_URL` when supplied and otherwise uses t
 
 1. Smoke-test the hosted app on Polygon: publish a real profile, small direct tip, vault deposit, self-paid claim, and sponsored claim.
 2. Verify contract source on PolygonScan.
-3. Confirm `https://versetip.pages.dev` is allowed in the Reown Cloud project if AppKit blocks the origin.
+3. Confirm the live Vercel origin is allowed in the Reown Cloud project if AppKit blocks it.
 4. Create a Polygon Safe and transfer vault ownership via Ownable2Step (`transferOwnership` then `acceptOwnership`). A single EOA should not remain the admin of the fund-holding vault. Then obtain an independent audit.
 
 ## Reference guides
