@@ -1687,8 +1687,6 @@ code {
   font-size: 10px;
   color: var(--text-tertiary);
 }
-  color: var(--text-tertiary);
-}
 .activity-list article > svg {
   color: var(--success);
 }
