@@ -126,15 +126,14 @@ Vite embeds `VITE_*` values at build / dev-server start. Restart after changing 
 
 ## Frontend hosting
 
-- Vercel project `versetip` (`prj_UmkYHSwWSvUwQ20WDPJZ5DIGgkoi`). Intended URL: `https://versetip.vercel.app`.
+- Personal fork: `Goodnessmbakara/Payments-and-merchant-solutions-`
+- Vercel project on the Goodness account: `versetip-app` (`prj_4B9wjt4bd7jl6lKGxPVdmF90a1Hq`), URL `https://versetip-app.vercel.app`
 - Cloudflare Pages project `versetip` was deleted. Do not redeploy the frontend there.
-- Git auto-deploy on Vercel still needs the Vercel GitHub app on the `VERSEDEVOPS` org.
-- Worker allowlist includes the Vercel origins, not `pages.dev`.
+- Worker allowlist includes the Vercel origins.
 
 ## Work remaining
 
-1. Install the Vercel GitHub app on `VERSEDEVOPS`, then deploy `main` to production.
-2. Smoke-test the hosted app on Polygon: publish a real profile, small direct tip, vault deposit, self-paid claim, sponsored claim.
+1. Smoke-test https://versetip-app.vercel.app on Polygon: publish a real profile, small direct tip, vault deposit, self-paid claim, sponsored claim.
 3. Verify contract source on PolygonScan.
 4. Confirm the Reown Cloud allowed-domain list includes the live Vercel origin.
 5. Create a Polygon Safe and transfer vault ownership with Ownable2Step (`transferOwnership` from the deployer, `acceptOwnership` from the Safe). This is the documented security upgrade, not optional polish. Then obtain an independent audit / remediation record (`docs/AUDIT_HANDOFF.md`).

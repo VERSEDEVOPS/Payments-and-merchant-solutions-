@@ -1,6 +1,6 @@
 # VerseTip
 
-**Live app:** [https://versetip.vercel.app](https://versetip.vercel.app)
+**Live app:** [https://versetip-app.vercel.app](https://versetip-app.vercel.app)
 
 VerseTip is a creator-tipping reference application for the Verse Buildathon. It combines one-transaction direct `fxVERSE` tips with a claimable campaign vault for messages, collaborator splits, batched withdrawals, and optional gas-sponsored claims.
 
@@ -42,13 +42,13 @@ Ownership can later move to a Safe through Ownable2Step. Formal `mainnet-release
 
 ## Frontend hosting
 
-The Vite app is a Vercel project named `versetip` (`prj_UmkYHSwWSvUwQ20WDPJZ5DIGgkoi`) on the Goodness Mbakara team.
+The Vite app deploys from the personal fork `Goodnessmbakara/Payments-and-merchant-solutions-` to Vercel project `versetip-app` (`prj_4B9wjt4bd7jl6lKGxPVdmF90a1Hq`).
 
-- Production alias: [https://versetip.vercel.app](https://versetip.vercel.app)
+- Production alias: [https://versetip-app.vercel.app](https://versetip-app.vercel.app)
 - Build: `pnpm install --frozen-lockfile` then `pnpm --filter @versetip/web build`, output `apps/web/dist`
-- Vite `VITE_*` values are set on the Vercel project (vault, registry, block, Worker URLs, Reown project ID)
+- Vite `VITE_*` values are set on that Vercel project
 - SPA fallback is in `vercel.json`
-- Git auto-deploy needs the [Vercel GitHub app](https://github.com/apps/vercel) installed on the `VERSEDEVOPS` org. The API cannot link this repo until that install exists.
+- Pushes to `main` on the fork trigger Vercel
 
 Add the live Vercel origin in the Reown Cloud allowed domains list if wallet connect refuses the hosted origin.
 
