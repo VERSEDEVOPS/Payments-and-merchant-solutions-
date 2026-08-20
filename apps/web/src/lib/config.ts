@@ -28,7 +28,8 @@ export const DEPLOYMENT_BLOCK = BigInt(
   import.meta.env.VITE_DEPLOYMENT_BLOCK || "0",
 );
 export const POLYGON_RPC_URL =
-  import.meta.env.VITE_POLYGON_RPC_URL || "https://polygon.drpc.org";
+  import.meta.env.VITE_POLYGON_RPC_URL ||
+  "https://polygon-bor-rpc.publicnode.com";
 export const WALLETCONNECT_PROJECT_ID =
   import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || "";
 

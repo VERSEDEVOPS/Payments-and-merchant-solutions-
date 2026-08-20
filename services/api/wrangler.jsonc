@@ -8,7 +8,7 @@
   "vars": {
     "ALLOWED_ORIGIN": "http://localhost:5173,http://127.0.0.1:5173,https://versetip.vercel.app,https://versetip-goodness-projects-8409b031.vercel.app,https://versetip-app.vercel.app,https://versetip-app-goodness-projects-8409b031.vercel.app",
     "MAX_SPONSORED_CLAIM_WEI": "100000000000000000000000",
-    "POLYGON_RPC_URL": "https://polygon.drpc.org",
+    "POLYGON_RPC_URL": "https://polygon-bor-rpc.publicnode.com",
     "TIP_VAULT_ADDRESS": "0x706DB138a532b59Df3664f3e8aB86e36a744DD00",
   },
   "ratelimits": [
