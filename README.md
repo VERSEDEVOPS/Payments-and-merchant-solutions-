@@ -8,7 +8,7 @@ The production chain is **Polygon mainnet (chain ID 137)**. The supported token 
 
 > **Mainnet status (2026-08-16):** `CreatorRegistry` and `TipVault` are live on Polygon. The vault is owned by the deployer EOA for this version, not a Safe. No independent audit has been completed. Treat this as a working reference deploy, not an audited production vault.
 
-## Live contracts
+## Live contracts!
 
 | Contract | Address | Deploy tx | Block |
 | --- | --- | --- | --- |
